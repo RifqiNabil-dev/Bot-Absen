@@ -5,12 +5,8 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 let auth = null;
 
 try {
-  if (process.env.GOOGLE_CREDENTIALS_BASE64_ABSEN) {
-    const credentials = JSON.parse(
-      Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64_ABSEN, "base64").toString(
-        "utf-8",
-      ),
-    );
+  if (process.env.GOOGLE_CREDENTIALS_ABSEN) {
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_ABSEN);
 
     auth = new google.auth.GoogleAuth({
       credentials,
