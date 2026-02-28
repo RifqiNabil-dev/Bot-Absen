@@ -5,12 +5,9 @@
   "scripts": {
     "start": "node src/index.js"
   },
-  "dependencies": {
-    "discord.js": "^14.0.0",
-    "dotenv": "^16.0.0"
-  }
-},
-{
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "dayjs": "^1.11.19",
     "discord.js": "^14.25.1",
