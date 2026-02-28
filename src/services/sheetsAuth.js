@@ -1,25 +1,26 @@
 const { google } = require("googleapis");
-const path = require("path");
-const fs = require("fs");
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
-
-// Attempt to load credentials
-const credentialsPath = path.join(__dirname, "../../credentials.json");
 
 let auth = null;
 
 try {
-  if (fs.existsSync(credentialsPath)) {
-    const credentials = require(credentialsPath);
+  if (process.env.GOOGLE_CREDENTIALS_BASE64_ABSEN) {
+    const credentials = JSON.parse(
+      Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64_ABSEN, "base64").toString(
+        "utf-8",
+      ),
+    );
+
     auth = new google.auth.GoogleAuth({
       credentials,
       scopes: SCOPES,
     });
-    console.log("Google Sheets: credentials.json loaded successfully.");
+
+    console.log("Google Sheets: Loaded from environment variable.");
   } else {
     console.warn(
-      "Google Sheets: credentials.json not found. API features will be disabled.",
+      "Google Sheets: GOOGLE_CREDENTIALS_BASE64_ABSEN not found. API disabled.",
     );
   }
 } catch (error) {
