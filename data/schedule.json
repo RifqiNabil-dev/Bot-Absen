@@ -1,0 +1,202 @@
+[
+  {
+    "bossName": "Timitris",
+    "bossPoints": 5,
+    "appearDate": "8:10:00"
+  },
+  {
+    "bossName": "Contaminated Cruma",
+    "bossPoints": 10,
+    "appearDate": "0:17:00"
+  },
+  {
+    "bossName": "Flynt",
+    "bossPoints": 100,
+    "appearDate": "0:21:00"
+  },
+  {
+    "bossName": "Timiniel",
+    "bossPoints": 15,
+    "appearDate": "0:40:00"
+  },
+  {
+    "bossName": "Basila",
+    "bossPoints": 3,
+    "appearDate": "1:24:00"
+  },
+  {
+    "bossName": "Queen Ant",
+    "bossPoints": 15,
+    "appearDate": "1:31:00"
+  },
+  {
+    "bossName": "Black Lily",
+    "bossPoints": 13,
+    "appearDate": "1:36:00"
+  },
+  {
+    "bossName": "Hisilrome",
+    "bossPoints": 30,
+    "appearDate": "1:38:00"
+  },
+  {
+    "bossName": "Coroon",
+    "bossPoints": 15,
+    "appearDate": "1:48:00"
+  },
+  {
+    "bossName": "Kelsus",
+    "bossPoints": 5,
+    "appearDate": "2:03:00"
+  },
+  {
+    "bossName": "Sarka",
+    "bossPoints": 3,
+    "appearDate": "2:10:00"
+  },
+  {
+    "bossName": "Talakin",
+    "bossPoints": 10,
+    "appearDate": "2:11:00"
+  },
+  {
+    "bossName": "Medusa",
+    "bossPoints": 5,
+    "appearDate": "2:13:00"
+  },
+  {
+    "bossName": "Katan",
+    "bossPoints": 15,
+    "appearDate": "2:23:00"
+  },
+  {
+    "bossName": "Behemoth",
+    "bossPoints": 13,
+    "appearDate": "2:29:00"
+  },
+  {
+    "bossName": "Felis",
+    "bossPoints": 3,
+    "appearDate": "2:32:00"
+  },
+  {
+    "bossName": "Tromba",
+    "bossPoints": 3,
+    "appearDate": "3:16:00"
+  },
+  {
+    "bossName": "Haff",
+    "bossPoints": 100,
+    "appearDate": "3:20:00"
+  },
+  {
+    "bossName": "Stonegeist",
+    "bossPoints": 5,
+    "appearDate": "3:24:00"
+  },
+  {
+    "bossName": "Repiro",
+    "bossPoints": 13,
+    "appearDate": "3:34:00"
+  },
+  {
+    "bossName": "Samuel",
+    "bossPoints": 30,
+    "appearDate": "4:02:00"
+  },
+  {
+    "bossName": "Pan Narod",
+    "bossPoints": 3,
+    "appearDate": "4:24:00"
+  },
+  {
+    "bossName": "Selu",
+    "bossPoints": 5,
+    "appearDate": "5:23:00"
+  },
+  {
+    "bossName": "Chertuba",
+    "bossPoints": 3,
+    "appearDate": "5:23:00"
+  },
+  {
+    "bossName": "Breka",
+    "bossPoints": 3,
+    "appearDate": "5:23:00"
+  },
+  {
+    "bossName": "Enkura",
+    "bossPoints": 3,
+    "appearDate": "5:24:00"
+  },
+  {
+    "bossName": "Talkin",
+    "bossPoints": 5,
+    "appearDate": "5:25:00"
+  },
+  {
+    "bossName": "Valefar",
+    "bossPoints": 5,
+    "appearDate": "5:25:00"
+  },
+  {
+    "bossName": "Matura",
+    "bossPoints": 3,
+    "appearDate": "5:26:00"
+  },
+  {
+    "bossName": "Balbo",
+    "bossPoints": 5,
+    "appearDate": "5:27:00"
+  },
+  {
+    "bossName": "Mutated Cruma",
+    "bossPoints": 10,
+    "appearDate": "5:37:00"
+  },
+  {
+    "bossName": "Mirror of Oblivion",
+    "bossPoints": 30,
+    "appearDate": "6:18:00"
+  },
+  {
+    "bossName": "Glaki",
+    "bossPoints": 75,
+    "appearDate": "6:22:00"
+  },
+  {
+    "bossName": "Core Susceptor",
+    "bossPoints": 50,
+    "appearDate": "7:35:00"
+  },
+  {
+    "bossName": "Cabrio",
+    "bossPoints": 100,
+    "appearDate": "7:53:00"
+  },
+  {
+    "bossName": "DragonBeast",
+    "bossPoints": 75,
+    "appearDate": "8:11:00"
+  },
+  {
+    "bossName": "Pan Dra'eed",
+    "bossPoints": 5,
+    "appearDate": "8:11:00"
+  },
+  {
+    "bossName": "Savan",
+    "bossPoints": 5,
+    "appearDate": "8:12:00"
+  },
+  {
+    "bossName": "Gahareth",
+    "bossPoints": 5,
+    "appearDate": "8:30:00"
+  },
+  {
+    "bossName": "Landor",
+    "bossPoints": 30,
+    "appearDate": "8:38:00"
+  }
+]

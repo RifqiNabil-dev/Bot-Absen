@@ -1,0 +1,22 @@
+# Node
+node_modules/
+
+# Environment
+.env
+
+# Google API Credentials
+credentials.json
+credentials2.json
+
+# Database
+data/database.sqlite
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing files
+test-*.js
