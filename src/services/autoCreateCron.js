@@ -14,6 +14,7 @@ const {
 } = require("./scheduleSheets");
 const dbQueries = require("../db/queries");
 const { getBossImage } = require("../utils/imageMapper");
+const { createAttendanceUI } = require("../utils/attendanceUI");
 
 function initAutoCreateCron(client) {
   // 1. Fetch from Google Sheets every 30 minutes and save to JSON cache
@@ -70,53 +71,16 @@ function initAutoCreateCron(client) {
 
           const createDateStr = now.format("YYYY-MM-DD HH:mm");
           const formattedAppearDate = appearDate.format("HH:mm");
-
-          const bossImageUrl = getBossImage(boss.bossName);
-
-          const embed = new EmbedBuilder()
-            .setColor("#0099ff")
-            .setTitle(`⚔️ Boss Spawn: ${boss.bossName} ⚔️`)
-            .setImage(bossImageUrl)
-            .addFields(
-              {
-                name: "Boss Points",
-                value: `${boss.bossPoints}`,
-                inline: true,
-              },
-              {
-                name: "Spawn Time",
-                value: formattedAppearDate,
-                inline: true,
-              },
-              { name: "Created Time", value: createDateStr, inline: true },
-              {
-                name: "📄Participants List (0)",
-                value: "No one has checked in yet.",
-              },
-            )
-            .setTimestamp();
-
-          const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-              .setCustomId("take_attendance")
-              .setLabel("Join Attendance")
-              .setStyle(ButtonStyle.Success)
-              .setEmoji("✅"),
-            new ButtonBuilder()
-              .setCustomId("cancel_attendance")
-              .setLabel("Cancel Attendance")
-              .setStyle(ButtonStyle.Secondary)
-              .setEmoji("❌"),
-            new ButtonBuilder()
-              .setCustomId("close_absence")
-              .setLabel("Close Event")
-              .setStyle(ButtonStyle.Danger)
-              .setEmoji("🛑"),
+          const { embed, components: rows } = createAttendanceUI(
+            boss.bossName,
+            boss.bossPoints,
+            formattedAppearDate,
+            createDateStr,
           );
 
           const message = await attendanceChannel.send({
             embeds: [embed],
-            components: [row],
+            components: rows,
           });
 
           embed.setFooter({ text: `Message ID: ${message.id}` });
