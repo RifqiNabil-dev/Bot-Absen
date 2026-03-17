@@ -23,8 +23,7 @@ function createAttendanceUI(
       { name: "Boss Points", value: `${bossPoints}`, inline: true },
       { name: "Spawn Time", value: appearDate, inline: true },
       { name: "Created Time", value: createDate, inline: true },
-    )
-    .setTimestamp();
+    );
 
   const listString =
     attendanceList

@@ -206,8 +206,10 @@ module.exports = {
               interaction.user.globalName ||
               interaction.user.username;
 
+            const closeTime = require("dayjs")().format("HH:mm");
+
             newEmbed.setFooter({
-              text: `${footerText} • Closed by: ${closingProfileName}`,
+              text: `${footerText}\nClosed by: ${closingProfileName} • ${closeTime}`,
             });
             await message.edit({ embeds: [newEmbed], components: [] });
           } else {
