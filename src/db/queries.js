@@ -127,31 +127,42 @@ async function deleteAbsenceByMessageId(messageId) {
 /**
  * Attendance functions
  */
-async function addAttendance(messageId, userId, profileName, attendanceDate) {
+async function addAttendance(
+  messageId,
+  userId,
+  profileName,
+  attendanceDate,
+  phase = null,
+) {
   const db = dbManager.get();
 
-  // Check if user already took attendance
+  // Check if user already took attendance for this specific phase
   const existing = await db.get(
-    "SELECT id FROM attendance WHERE message_id = ? AND user_id = ?",
-    [messageId, userId],
+    "SELECT id FROM attendance WHERE message_id = ? AND user_id = ? AND (phase = ? OR (? IS NULL AND phase IS NULL))",
+    [messageId, userId, phase, phase],
   );
   if (existing) {
     return { success: false, error: "User already recorded" };
   }
 
   const result = await db.run(
-    "INSERT INTO attendance (message_id, user_id, profile_name, attendance_date) VALUES (?, ?, ?, ?)",
-    [messageId, userId, profileName, attendanceDate],
+    "INSERT INTO attendance (message_id, user_id, profile_name, attendance_date, phase) VALUES (?, ?, ?, ?, ?)",
+    [messageId, userId, profileName, attendanceDate, phase],
   );
   return { success: true, id: result.lastID };
 }
 
-async function removeAttendance(messageId, userId) {
+async function removeAttendance(messageId, userId, phase = null) {
   const db = dbManager.get();
-  const result = await db.run(
-    "DELETE FROM attendance WHERE message_id = ? AND user_id = ?",
-    [messageId, userId],
-  );
+  let query = "DELETE FROM attendance WHERE message_id = ? AND user_id = ?";
+  let params = [messageId, userId];
+
+  if (phase !== null) {
+    query += " AND phase = ?";
+    params.push(phase);
+  }
+
+  const result = await db.run(query, params);
   return { success: true, changes: result.changes };
 }
 

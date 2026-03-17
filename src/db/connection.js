@@ -50,6 +50,7 @@ class Database {
                 user_id TEXT,
                 profile_name TEXT,
                 attendance_date TEXT,
+                phase INTEGER,
                 FOREIGN KEY(message_id) REFERENCES absences(message_id)
             );
         `);

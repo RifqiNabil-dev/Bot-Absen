@@ -10,6 +10,7 @@ const {
 const dbQueries = require("../db/queries");
 const dayjs = require("dayjs");
 const { getBossImage } = require("../utils/imageMapper");
+const { createAttendanceUI } = require("../utils/attendanceUI");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -100,49 +101,17 @@ module.exports = {
 
       const bossImageUrl = getBossImage(bossData.name);
 
-      // 1. Build the UI
-      const embed = new EmbedBuilder()
-        .setColor("#0099ff")
-        .setTitle(`⚔️ Boss Spawn: ${bossData.name} ⚔️`)
-        .setImage(bossImageUrl)
-        .addFields(
-          { name: "Boss Points", value: `${bossData.points}`, inline: true },
-          {
-            name: "Spawn Time",
-            value: formattedAppearDate,
-            inline: true,
-          },
-          { name: "Created Time", value: createDateStr, inline: true },
-          {
-            name: "📄Participants List (0)",
-            value: "No one has checked in yet.",
-          },
-        )
-        .setTimestamp();
-      // Footer will hold the message ID later
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("take_attendance")
-          .setLabel("Join Attendance")
-          .setStyle(ButtonStyle.Success)
-          .setEmoji("✅"),
-        new ButtonBuilder()
-          .setCustomId("cancel_attendance")
-          .setLabel("Cancel Attendance")
-          .setStyle(ButtonStyle.Secondary)
-          .setEmoji("❌"),
-        new ButtonBuilder()
-          .setCustomId("close_absence")
-          .setLabel("Close Event")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("🛑"),
+      const { embed, components: rows } = createAttendanceUI(
+        bossData.name,
+        bossData.points,
+        formattedAppearDate,
+        createDateStr,
       );
 
       // 2. Send the message to Channel 2
       const message = await attendanceChannel.send({
         embeds: [embed],
-        components: [row],
+        components: rows,
       });
 
       // 3. Update footer with Message ID now that we have it
