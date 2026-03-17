@@ -115,8 +115,12 @@ module.exports = {
       });
 
       // 3. Update footer with Message ID now that we have it
+      const profileName =
+        interaction.member?.nickname ||
+        interaction.user.globalName ||
+        interaction.user.username;
       embed.setFooter({
-        text: `Message ID: ${message.id} • Created by: ${interaction.guild.name}`,
+        text: `Message ID: ${message.id} • Created by: ${profileName}`,
       });
       await message.edit({ embeds: [embed] });
 

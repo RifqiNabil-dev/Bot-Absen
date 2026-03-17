@@ -200,8 +200,14 @@ module.exports = {
             const { EmbedBuilder } = require("discord.js");
             const newEmbed = EmbedBuilder.from(embed);
             const footerText = embed.footer?.text || "";
+
+            const closingProfileName =
+              interaction.member?.nickname ||
+              interaction.user.globalName ||
+              interaction.user.username;
+
             newEmbed.setFooter({
-              text: `${footerText} • Closed by: ${interaction.guild.name}`,
+              text: `${footerText} • Closed by: ${closingProfileName}`,
             });
             await message.edit({ embeds: [newEmbed], components: [] });
           } else {
