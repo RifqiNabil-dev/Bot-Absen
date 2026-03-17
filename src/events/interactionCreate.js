@@ -195,7 +195,18 @@ module.exports = {
           await dbQueries.closeAbsence(message.id);
 
           // Remove buttons from message as per spec
-          await message.edit({ components: [] });
+          const embed = message.embeds[0];
+          if (embed) {
+            const { EmbedBuilder } = require("discord.js");
+            const newEmbed = EmbedBuilder.from(embed);
+            const footerText = embed.footer?.text || "";
+            newEmbed.setFooter({
+              text: `${footerText} • Closed by: ${interaction.guild.name}`,
+            });
+            await message.edit({ embeds: [newEmbed], components: [] });
+          } else {
+            await message.edit({ components: [] });
+          }
 
           await interaction.editReply(
             "Absence closed successfully. Buttons have been removed.",

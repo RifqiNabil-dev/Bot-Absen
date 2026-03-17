@@ -115,7 +115,9 @@ module.exports = {
       });
 
       // 3. Update footer with Message ID now that we have it
-      embed.setFooter({ text: `Message ID: ${message.id}` });
+      embed.setFooter({
+        text: `Message ID: ${message.id} • Created by: ${interaction.guild.name}`,
+      });
       await message.edit({ embeds: [embed] });
 
       // 4. Save to Database
