@@ -35,8 +35,7 @@ module.exports = {
       const dbQueries = require("../db/queries");
       const { writeAttendance } = require("../services/attendanceSheets");
 
-      const isOrfenButton = customId.startsWith("orfen_p");
-      if (customId === "take_attendance" || isOrfenButton) {
+      if (customId === "take_attendance") {
         await interaction.deferReply({ ephemeral: true });
 
         try {
@@ -50,11 +49,6 @@ module.exports = {
             return interaction.editReply("This absence is no longer active.");
           }
 
-          let phase = null;
-          if (isOrfenButton) {
-            phase = parseInt(customId.replace("orfen_p", ""));
-          }
-
           const profileName =
             member?.nickname || user.globalName || user.username;
           const attendanceDate = require("dayjs")().format(
@@ -66,12 +60,11 @@ module.exports = {
             user.id,
             profileName,
             attendanceDate,
-            phase,
           );
 
           if (!result.success) {
             return interaction.editReply(
-              `You have already taken attendance for this ${phase ? "phase" : "boss"}!`,
+              "You have already taken attendance for this boss!",
             );
           }
 
@@ -82,65 +75,35 @@ module.exports = {
             const { EmbedBuilder } = require("discord.js");
             const newEmbed = EmbedBuilder.from(embed);
 
-            if (absence.boss_name.toLowerCase() === "orfen") {
-              // Update Phase fields
-              for (let p = 1; p <= 3; p++) {
-                const phaseAttendance = latestAttendance.filter(
-                  (a) => a.phase === p,
-                );
-                const points = p === 2 ? 65 : 30;
-                const listString =
-                  phaseAttendance
-                    .map(
-                      (record, index) => `${index + 1}. ${record.profile_name}`,
-                    )
-                    .join("\n") || "No one checked in.";
+            const listString =
+              latestAttendance
+                .map((record, index) => `${index + 1}. ${record.profile_name}`)
+                .join("\n") || "No one has checked in yet.";
 
-                const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
-                  f.name.includes(`Phase ${p}`),
-                );
-                if (fieldIndex !== undefined && fieldIndex !== -1) {
-                  newEmbed.data.fields[fieldIndex].name =
-                    `📄Phase ${p} (${points} pts) (${phaseAttendance.length})`;
-                  newEmbed.data.fields[fieldIndex].value = listString;
-                }
-              }
-            } else {
-              const listString =
-                latestAttendance
-                  .map(
-                    (record, index) => `${index + 1}. ${record.profile_name}`,
-                  )
-                  .join("\n") || "No one has checked in yet.";
-
-              const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
-                f.name.includes("📄Participants List"),
-              );
-              if (fieldIndex !== undefined && fieldIndex !== -1) {
-                newEmbed.data.fields[fieldIndex].name =
-                  `📄Participants List (${latestAttendance.length})`;
-                newEmbed.data.fields[fieldIndex].value = listString;
-              }
+            const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
+              f.name.includes("📄Participants List"),
+            );
+            if (fieldIndex !== undefined && fieldIndex !== -1) {
+              newEmbed.data.fields[fieldIndex].name = `📄Participants List (${latestAttendance.length})`;
+              newEmbed.data.fields[fieldIndex].value = listString;
             }
 
             await message.edit({ embeds: [newEmbed] });
           }
 
-          // Write to Google Sheets (ONLY for normal bosses)
-          if (absence.boss_name.toLowerCase() !== "orfen") {
-            await writeAttendance(
-              message.id,
-              profileName,
-              absence.boss_name,
-              absence.boss_points,
-              attendanceDate,
-              absence.create_date,
-              absence.appear_date,
-            );
-          }
+          // Write to Google Sheets
+          await writeAttendance(
+            message.id,
+            profileName,
+            absence.boss_name,
+            absence.boss_points,
+            attendanceDate,
+            absence.create_date,
+            absence.appear_date,
+          );
 
           await interaction.editReply(
-            `Successfully recorded attendance for ${phase ? "Phase " + phase : "the boss"} as **${profileName}**.`,
+            `Successfully recorded attendance as **${profileName}**.`,
           );
         } catch (error) {
           console.error("Error taking attendance:", error);
@@ -183,15 +146,7 @@ module.exports = {
           const {
             removeAttendanceRecord,
           } = require("../services/attendanceSheets");
-
-          if (absence.boss_name.toLowerCase() === "orfen") {
-            // For Orfen, we might have multiple records in Sheets if we already closed it (unlikely but safe)
-            // Or if we haven't closed it yet, there's nothing in sheets anyway.
-            // Spec says "cancel feature will cancel all absences from phase 1 to phase 3"
-            await removeAttendanceRecord(message.id, profileName);
-          } else {
-            await removeAttendanceRecord(message.id, profileName);
-          }
+          await removeAttendanceRecord(message.id, profileName);
 
           // 3. Update the Embed
           const updatedAttendance = await dbQueries.getAttendance(message.id);
@@ -199,46 +154,18 @@ module.exports = {
           if (embed) {
             const newEmbed = require("discord.js").EmbedBuilder.from(embed);
 
-            if (absence.boss_name.toLowerCase() === "orfen") {
-              // Update Phase fields
-              for (let p = 1; p <= 3; p++) {
-                const phaseAttendance = updatedAttendance.filter(
-                  (a) => a.phase === p,
-                );
-                const points = p === 2 ? 65 : 30;
-                const listString =
-                  phaseAttendance
-                    .map(
-                      (record, index) => `${index + 1}. ${record.profile_name}`,
-                    )
-                    .join("\n") || "No one checked in.";
+            const listString =
+              updatedAttendance
+                .map((record, index) => `${index + 1}. ${record.profile_name}`)
+                .join("\n") || "No one has checked in yet.";
 
-                const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
-                  f.name.includes(`Phase ${p}`),
-                );
-                if (fieldIndex !== undefined && fieldIndex !== -1) {
-                  newEmbed.data.fields[fieldIndex].name =
-                    `📄Phase ${p} (${points} pts) (${phaseAttendance.length})`;
-                  newEmbed.data.fields[fieldIndex].value = listString;
-                }
-              }
-            } else {
-              const listString =
-                updatedAttendance
-                  .map(
-                    (record, index) => `${index + 1}. ${record.profile_name}`,
-                  )
-                  .join("\n") || "No one has checked in yet.";
-
-              const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
-                f.name.includes("📄Participants List"),
-              );
-              if (fieldIndex !== undefined && fieldIndex !== -1) {
-                const totalCount = updatedAttendance.length;
-                newEmbed.data.fields[fieldIndex].name =
-                  `📄Participants List (${totalCount})`;
-                newEmbed.data.fields[fieldIndex].value = listString;
-              }
+            const fieldIndex = newEmbed.data.fields?.findIndex((f) =>
+              f.name.includes("📄Participants List"),
+            );
+            if (fieldIndex !== undefined && fieldIndex !== -1) {
+              const totalCount = updatedAttendance.length;
+              newEmbed.data.fields[fieldIndex].name = `📄Participants List (${totalCount})`;
+              newEmbed.data.fields[fieldIndex].value = listString;
             }
 
             await message.edit({ embeds: [newEmbed] });
@@ -265,49 +192,7 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
 
         try {
-          const absence = await dbQueries.getAbsence(message.id);
-          if (!absence) {
-            return interaction.editReply("Absence not found.");
-          }
-
           await dbQueries.closeAbsence(message.id);
-
-          // If Orfen, aggregate and write to sheets
-          if (absence.boss_name.toLowerCase() === "orfen") {
-            const attendanceByPhases = await dbQueries.getAttendance(
-              message.id,
-            );
-            const userAggregates = {};
-
-            attendanceByPhases.forEach((a) => {
-              if (!userAggregates[a.user_id]) {
-                userAggregates[a.user_id] = {
-                  profileName: a.profile_name,
-                  totalPoints: 0,
-                  latestDate: a.attendance_date,
-                };
-              }
-              // Phase 1 -> 30, Phase 2 -> 65, Phase 3 -> 30
-              if (a.phase === 1) userAggregates[a.user_id].totalPoints += 30;
-              else if (a.phase === 2)
-                userAggregates[a.user_id].totalPoints += 65;
-              else if (a.phase === 3)
-                userAggregates[a.user_id].totalPoints += 30;
-            });
-
-            for (const userId in userAggregates) {
-              const data = userAggregates[userId];
-              await writeAttendance(
-                message.id,
-                data.profileName,
-                absence.boss_name,
-                data.totalPoints,
-                data.latestDate,
-                absence.create_date,
-                absence.appear_date,
-              );
-            }
-          }
 
           // Remove buttons from message as per spec
           await message.edit({ components: [] });
