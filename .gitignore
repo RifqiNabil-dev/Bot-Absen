@@ -20,3 +20,6 @@ Thumbs.db
 
 # Testing files
 test-*.js
+
+# Data files
+data/schedule.json

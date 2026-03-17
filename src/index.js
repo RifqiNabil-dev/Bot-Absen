@@ -3,7 +3,14 @@ require("dotenv").config();
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+const dns = require("dns");
 const db = require("./db/connection");
+
+// Force IPv4 as a priority. This fixes ConnectTimeoutError in many environments (Docker/Linux)
+// where IPv6 lookup or connection might be problematic.
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 const client = new Client({
   intents: [
@@ -11,6 +18,10 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  rest: {
+    timeout: 30000, // Increase REST timeout to 30 seconds
+    retries: 3,
+  },
 });
 
 client.commands = new Collection();
