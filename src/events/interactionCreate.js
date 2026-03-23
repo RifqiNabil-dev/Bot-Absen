@@ -242,7 +242,7 @@ module.exports = {
 
           const confirmEmbed = new EmbedBuilder()
             .setColor("#ff9900")
-            .setTitle("⚠️ Confirm Deletion")
+            .setTitle("⚠️ Confirm Delete")
             .setDescription(
               `Are you sure you want to delete the absence record for **${absence.boss_name}**?\n\nThis will:\n1. Delete the message from <#${process.env.ATTENDANCE_CHANNEL_ID}>\n2. Remove all records from the database\n3. Remove records from Google Sheets\n4. Remove from the spawn schedule`,
             )
@@ -250,7 +250,9 @@ module.exports = {
 
           const confirmRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-              .setCustomId(`confirm_delete_absence_${targetMessageId}`)
+              .setCustomId(
+                `confirm_delete_absence_${targetMessageId}_${interaction.message.id}`,
+              )
               .setLabel("Yes, Delete")
               .setStyle(ButtonStyle.Danger)
               .setEmoji("🗑️"),
@@ -271,7 +273,9 @@ module.exports = {
           );
         }
       } else if (customId.startsWith("confirm_delete_absence_")) {
-        const targetMessageId = customId.replace("confirm_delete_absence_", "");
+        const parts = customId.split("_");
+        const targetMessageId = parts[3];
+        const logMessageId = parts[4];
         const {
           deleteAttendanceByMessageId,
         } = require("../services/attendanceSheets");
@@ -329,6 +333,36 @@ module.exports = {
             embeds: [logEmbed],
             components: [],
           });
+
+          // 6. Update the original Log Message (remove buttons)
+          const logChannel = client.channels.cache.get(
+            process.env.LOG_CHANNEL_ID,
+          );
+          if (logChannel && logMessageId) {
+            try {
+              const originalLogMessage =
+                await logChannel.messages.fetch(logMessageId);
+              if (originalLogMessage) {
+                const logEmbed = require("discord.js").EmbedBuilder.from(
+                  originalLogMessage.embeds[0],
+                )
+                  .setColor("#808080")
+                  .setDescription(
+                    (originalLogMessage.embeds[0].description || "") +
+                      "\n\n✅ **Absence Deleted and processed.**",
+                  );
+                await originalLogMessage.edit({
+                  embeds: [logEmbed],
+                  components: [],
+                });
+              }
+            } catch (err) {
+              console.warn(
+                `Could not fetch or update original log message ${logMessageId}:`,
+                err,
+              );
+            }
+          }
         } catch (error) {
           console.error("Error during full deletion cleanup:", error);
           await interaction.followUp({
