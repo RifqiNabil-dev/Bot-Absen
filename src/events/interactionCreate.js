@@ -317,18 +317,16 @@ module.exports = {
           // 5. Update the Log Message
           const logEmbed = require("discord.js").EmbedBuilder.from(
             message.embeds[0],
-          );
-          logEmbed
+          )
             .setColor("#808080")
             .setDescription(
               (message.embeds[0].description || "") +
                 "\n\n✅ **Deleted successfully from system and schedule.**",
             );
-          await message.edit({ embeds: [logEmbed], components: [] });
 
           await interaction.editReply({
             content: `Successfully deleted absence for **${absence.boss_name}** and removed from schedule.`,
-            embeds: [],
+            embeds: [logEmbed],
             components: [],
           });
         } catch (error) {
