@@ -84,7 +84,8 @@ module.exports = {
               f.name.includes("📄Participants List"),
             );
             if (fieldIndex !== undefined && fieldIndex !== -1) {
-              newEmbed.data.fields[fieldIndex].name = `📄Participants List (${latestAttendance.length})`;
+              newEmbed.data.fields[fieldIndex].name =
+                `📄Participants List (${latestAttendance.length})`;
               newEmbed.data.fields[fieldIndex].value = listString;
             }
 
@@ -164,7 +165,8 @@ module.exports = {
             );
             if (fieldIndex !== undefined && fieldIndex !== -1) {
               const totalCount = updatedAttendance.length;
-              newEmbed.data.fields[fieldIndex].name = `📄Participants List (${totalCount})`;
+              newEmbed.data.fields[fieldIndex].name =
+                `📄Participants List (${totalCount})`;
               newEmbed.data.fields[fieldIndex].value = listString;
             }
 
@@ -238,6 +240,18 @@ module.exports = {
           const absence = await dbQueries.getAbsence(targetMessageId);
           if (!absence) {
             return interaction.editReply("Absence not found in database.");
+          }
+
+          // Update the log message with the instruction
+          const currentEmbed = interaction.message.embeds[0];
+          if (
+            currentEmbed &&
+            !currentEmbed.description?.includes("Scroll ke bawah")
+          ) {
+            const updatedLogEmbed = EmbedBuilder.from(currentEmbed).setDescription(
+              `${currentEmbed.description}\n\n**Scroll ke bawah untuk konfirmasi delete**`,
+            );
+            await interaction.message.edit({ embeds: [updatedLogEmbed] });
           }
 
           const confirmEmbed = new EmbedBuilder()
@@ -319,9 +333,8 @@ module.exports = {
           await removeFromSchedule(absence.boss_name);
 
           // 5. Update the Log Message
-          const logEmbed = require("discord.js").EmbedBuilder.from(
-            message.embeds[0],
-          )
+          const logEmbed = require("discord.js")
+            .EmbedBuilder.from(message.embeds[0])
             .setColor("#808080")
             .setDescription(
               (message.embeds[0].description || "") +
@@ -343,9 +356,8 @@ module.exports = {
               const originalLogMessage =
                 await logChannel.messages.fetch(logMessageId);
               if (originalLogMessage) {
-                const logEmbed = require("discord.js").EmbedBuilder.from(
-                  originalLogMessage.embeds[0],
-                )
+                const logEmbed = require("discord.js")
+                  .EmbedBuilder.from(originalLogMessage.embeds[0])
                   .setColor("#808080")
                   .setDescription(
                     (originalLogMessage.embeds[0].description || "") +
