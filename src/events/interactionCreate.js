@@ -226,21 +226,68 @@ module.exports = {
       } else if (customId.startsWith("delete_absence_")) {
         const targetMessageId = customId.replace("delete_absence_", "");
         const {
-          deleteAttendanceByMessageId,
-        } = require("../services/attendanceSheets");
-        const { removeFromSchedule } = require("../services/scheduleSheets");
-        const dayjs = require("dayjs");
+          EmbedBuilder,
+          ActionRowBuilder,
+          ButtonBuilder,
+          ButtonStyle,
+        } = require("discord.js");
 
         await interaction.deferReply({ ephemeral: true });
 
         try {
-          // 0. Fetch absence data
           const absence = await dbQueries.getAbsence(targetMessageId);
           if (!absence) {
             return interaction.editReply("Absence not found in database.");
           }
 
-          // Delete button now has no validation, always allow deletion if record exists
+          const confirmEmbed = new EmbedBuilder()
+            .setColor("#ff9900")
+            .setTitle("⚠️ Confirm Deletion")
+            .setDescription(
+              `Are you sure you want to delete the absence record for **${absence.boss_name}**?\n\nThis will:\n1. Delete the message from <#${process.env.ATTENDANCE_CHANNEL_ID}>\n2. Remove all records from the database\n3. Remove records from Google Sheets\n4. Remove from the spawn schedule`,
+            )
+            .setTimestamp();
+
+          const confirmRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setCustomId(`confirm_delete_absence_${targetMessageId}`)
+              .setLabel("Yes, Delete")
+              .setStyle(ButtonStyle.Danger)
+              .setEmoji("🗑️"),
+            new ButtonBuilder()
+              .setCustomId(`cancel_delete_absence`)
+              .setLabel("No, Cancel")
+              .setStyle(ButtonStyle.Secondary),
+          );
+
+          await interaction.editReply({
+            embeds: [confirmEmbed],
+            components: [confirmRow],
+          });
+        } catch (error) {
+          console.error("Error showing deletion confirmation:", error);
+          await interaction.editReply(
+            "An error occurred while preparing the confirmation.",
+          );
+        }
+      } else if (customId.startsWith("confirm_delete_absence_")) {
+        const targetMessageId = customId.replace("confirm_delete_absence_", "");
+        const {
+          deleteAttendanceByMessageId,
+        } = require("../services/attendanceSheets");
+        const { removeFromSchedule } = require("../services/scheduleSheets");
+
+        await interaction.deferUpdate();
+
+        try {
+          // 0. Fetch absence data
+          const absence = await dbQueries.getAbsence(targetMessageId);
+          if (!absence) {
+            return interaction.followUp({
+              content: "Absence not found in database.",
+              ephemeral: true,
+            });
+          }
 
           // 1. Delete from Discord (Attendance Channel)
           const attendanceChannel = client.channels.cache.get(
@@ -279,13 +326,24 @@ module.exports = {
             );
           await message.edit({ embeds: [logEmbed], components: [] });
 
-          await interaction.editReply(
-            `Successfully deleted absence for **${absence.boss_name}** and removed from schedule.`,
-          );
+          await interaction.editReply({
+            content: `Successfully deleted absence for **${absence.boss_name}** and removed from schedule.`,
+            embeds: [],
+            components: [],
+          });
         } catch (error) {
           console.error("Error during full deletion cleanup:", error);
-          await interaction.editReply("An error occurred during deletion.");
+          await interaction.followUp({
+            content: "An error occurred during deletion.",
+            ephemeral: true,
+          });
         }
+      } else if (customId === "cancel_delete_absence") {
+        await interaction.update({
+          content: "❌ Deletion cancelled.",
+          embeds: [],
+          components: [],
+        });
       }
     } else if (interaction.isAutocomplete()) {
       const command = interaction.client.commands.get(interaction.commandName);
