@@ -1,6 +1,6 @@
 ﻿# ⚔️ Bot-Absen Discord
 
-A professional Discord bot designed for **Boss Attendance Management**, seamlessly integrated with **Google Sheets**. This bot is built to help gaming clans coordinate and track member participation during boss hunts effortlessly.
+A Discord bot designed for **Boss Attendance Management**, seamlessly integrated with **Google Sheets**. This bot is built to help gaming clans coordinate and track member participation during boss hunts effortlessly.
 
 ## 🚀 Key Features
 
